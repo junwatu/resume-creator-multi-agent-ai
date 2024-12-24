@@ -29,8 +29,25 @@ Creating a resume manually involves several steps:
 
 With the AI system, we can automate these steps using multi-agent systems. Each agent performs a specific task, such as extracting information, generating content, or formatting the resume. By coordinating these agents, we can create a fully automated resume creation system.
 
-### How it Works?
+## How it Works?
 
 In this blog, we automate the **information gathering** and **content writing** for the resume, tasks that are usually manual and time-consuming.
 
+This system diagram illustrates the resume creation process discussed in this blog, showcasing the collaboration between two main AI agents:
+
 ![agent diagram](images/agents-diagram.png)
+
+Here's a brief description:
+
+- The system starts with **User Input** and requires an environment setup that includes **Team Initialization** and **OpenAI API Key**.
+
+- Two AI agents work together:
+  - **Profile Analyst** (Agent AI 1): Handles data extraction from user input, breaking down information into categories like Name, Experience, Skills, Education, and Job History
+  - **Resume Writer** (Agent AI 2): Takes the structured information and handles the writing aspect
+
+- The workflow follows these key steps:
+  - **Data Extraction**: Organizes raw user input into structured categories. This the information gathering step.
+  - **Structured Information**: Stores the organized data
+  - **Resume Crafting**: Combines the structured data with writing capabilities. This the content writing step.
+  - **Create Resume**: Generates the content
+  - **Final Resume**: Produces the completed document
