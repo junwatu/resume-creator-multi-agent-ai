@@ -37,19 +37,19 @@ In this blog, we automate the **information gathering** and **content writing** 
 
 This system diagram illustrates the resume creation process discussed in this blog, showcasing the collaboration between two main AI agents:
 
-![agent diagram](images/agents-diagram.png)
+![agent diagram](images/ai-agents-diagram.png)
 
 Here's a brief description:
 
 - The system starts with **User Input** and requires an environment setup that includes **Team Initialization** and **OpenAI API Key**.
 
 - Two AI agents work together:
-  - **Profile Analyst** (Agent AI 1): Handles data extraction from user input, breaking down information into categories like Name, Experience, Skills, Education, and Job History
-  - **Resume Writer** (Agent AI 2): Takes the structured information and handles the writing aspect
+  - **Profile Analyst** (Agent AI 1): Handles data extraction from user input, breaking down information into categories like **Name**, **Experience**, **Skills**, **Education**, and **Job History**.
+  - **Resume Writer** (Agent AI 2): Takes the structured information and handles the writing aspect.
 
 - The workflow follows these key steps:
   - **Data Extraction**: Organizes raw user input into structured categories. This the information gathering step.
-  - **Structured Information**: Stores the organized data
+  - **Structured Information**: Stores the organized data into the GridDB Cloud database.
   - **Resume Crafting**: Combines the structured data with writing capabilities. This the content writing step.
   - **Create Resume**: Generates the content
   - **Final Resume**: Produces the completed document
@@ -57,3 +57,4 @@ Here's a brief description:
 ## User Interface
 
 ![user interface](images/resume-creator.png)
+
