@@ -48,13 +48,12 @@ Here's a brief description:
   - **Resume Writer** (Agent AI 2): Takes the structured information and handles the writing aspect.
 
 - The workflow follows these key steps:
-  - **Data Extraction**: Organizes raw user input into structured categories. This the information gathering step.
+  - **Data Extraction**: Organizes raw user input into. structured categories. This the information gathering step.
   - **Structured Information**: Stores the organized data into the GridDB Cloud database.
   - **Resume Crafting**: Combines the structured data with writing capabilities. This the content writing step.
-  - **Create Resume**: Generates the content
-  - **Final Resume**: Produces the completed document
+  - **Create Resume**: Generates the content.
+  - **Final Resume**: Produces the completed document.
 
 ## User Interface
 
 ![user interface](images/resume-creator.png)
-
