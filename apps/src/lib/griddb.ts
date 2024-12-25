@@ -1,13 +1,4 @@
-type ColumnDefinition = {
-	name: string
-	type: 'STRING' | 'INTEGER' | 'TIMESTAMP'
-}
-
-type CreateContainerPayload = {
-	containerName?: string
-	columns?: ColumnDefinition[]
-}
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type Query = {
 	type: string
 	stmt: string
@@ -19,13 +10,35 @@ type Config = {
 	password: string
 }
 
-export function createGridDBClient(config: Config) {
+type GridDBClient = {
+	createContainer: () => Promise<any>
+	insertData: (params: InsertDataParams) => Promise<any>
+	searchData: (queries: Query[]) => Promise<any>
+}
+
+type InsertDataParams = {
+	data: {
+		id: string
+		rawContent: string
+		formattedContent: string
+		version: number
+		status: string
+		createdAt: Date | string
+		updatedAt: Date | string
+		userId: string
+		template: string
+		metadata: string
+	}
+	containerName?: string
+}
+
+export function createGridDBClient(config: Config): GridDBClient {
 	const { griddbWebApiUrl, username, password } = config
 	const baseUrl = griddbWebApiUrl
 	const authToken = Buffer.from(`${username}:${password}`).toString('base64')
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	async function makeRequest<T>(path: string, payload: any): Promise<T> {
+	// Utility to make HTTP requests
+	async function makeRequest<T>(path: string, payload: unknown): Promise<T> {
 		const response = await fetch(`${baseUrl}${path}`, {
 			method: 'POST',
 			headers: {
@@ -41,27 +54,43 @@ export function createGridDBClient(config: Config) {
 			throw new Error(`HTTP error! status: ${response.status} - ${responseText || response.statusText}`)
 		}
 
-		return processResponse(responseText)
+		return parseResponse(responseText)
 	}
 
-	function processResponse(responseText: string, successMessage = 'Operation completed successfully') {
-		if (responseText) {
-			try {
-				return JSON.parse(responseText)
-			} catch {
-				return { message: successMessage, response: responseText }
-			}
+	// Utility to parse HTTP responses
+	function parseResponse(responseText: string, successMessage = 'Operation completed successfully') {
+		try {
+			return responseText ? JSON.parse(responseText) : { message: successMessage }
+		} catch {
+			return { message: successMessage, response: responseText }
 		}
-		return { message: successMessage }
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	async function createContainer(payload: CreateContainerPayload = {}): Promise<any> {
-		const defaultPayload = {
-			container_name: payload.containerName || 'resumes',
+	// Utility to format dates to ISO strings
+	function formatDate(value: Date | string): string {
+		return value instanceof Date ? value.toISOString() : value
+	}
+
+	// Utility to escape string values for SQL
+	function escapeString(value: string): string {
+		return value.replace(/'/g, "''")
+	}
+
+	// Handle errors uniformly
+	function wrapError(error: unknown, defaultMessage: string): never {
+		if (error instanceof Error) {
+			throw new Error(`${defaultMessage}: ${error.message}`)
+		}
+		throw new Error(`${defaultMessage}: Unknown error`)
+	}
+
+	// Create a GridDB container
+	async function createContainer(): Promise<any> {
+		const payload = {
+			container_name: 'resumes',
 			container_type: 'COLLECTION',
 			rowkey: true,
-			columns: payload.columns || [
+			columns: [
 				{ name: 'id', type: 'STRING' },
 				{ name: 'rawContent', type: 'STRING' },
 				{ name: 'formattedContent', type: 'STRING' },
@@ -74,92 +103,54 @@ export function createGridDBClient(config: Config) {
 				{ name: 'metadata', type: 'STRING' },
 			],
 		}
+
 		try {
-			return await makeRequest('/containers', defaultPayload)
+			return await makeRequest('/containers', payload)
 		} catch (error) {
-			if (error instanceof Error) {
-				throw new Error(`Failed to create GridDB container: ${error.message}`)
-			} else {
-				throw new Error('Failed to create GridDB container: Unknown error')
-			}
+			wrapError(error, 'Failed to create GridDB container')
 		}
 	}
 
+	// Insert data into a GridDB container
 	async function insertData({
 		data,
 		containerName = 'resumes',
-	}: {
-		data: {
-			id: string
-			rawContent: string
-			formattedContent: string
-			version: number
-			status: string
-			createdAt: Date | string
-			updatedAt: Date | string
-			userId: string
-			template: string
-			metadata: string
-		}
-		containerName?: string
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	}): Promise<any> {
+	}: InsertDataParams): Promise<any> {
 		try {
-			// Ensure timestamps are in ISO format
-			const createdAt =
-				data.createdAt instanceof Date ? data.createdAt.toISOString() : data.createdAt
-			const updatedAt =
-				data.updatedAt instanceof Date ? data.updatedAt.toISOString() : data.updatedAt
-
-			// Escape values to prevent SQL injection
 			const escapedValues = [
 				data.id,
 				data.rawContent,
 				data.formattedContent,
 				data.version,
 				data.status,
-				createdAt,
-				updatedAt,
+				formatDate(data.createdAt),
+				formatDate(data.updatedAt),
 				data.userId,
 				data.template,
 				data.metadata,
-			].map((value) => (typeof value === 'string' ? value.replace(/'/g, "''") : value))
+			].map((value) => (typeof value === 'string' ? escapeString(value) : value))
 
-			// Build the SQL query
 			const sql = `INSERT INTO ${containerName}(id, rawContent, formattedContent, version, status, createdAt, updatedAt, userId, template, metadata) 
-VALUES('${escapedValues[0]}', '${escapedValues[1]}', '${escapedValues[2]}', ${escapedValues[3]}, '${escapedValues[4]}', TIMESTAMP('${escapedValues[5]}'), TIMESTAMP('${escapedValues[6]}'), '${escapedValues[7]}', '${escapedValues[8]}', '${escapedValues[9]}')`
+VALUES('${escapedValues.join("', '")}')`
 
-			// Execute the SQL query via GridDB
 			return await makeRequest('/sql/update', [{ stmt: sql }])
 		} catch (error) {
-			if (error instanceof Error) {
-				throw new Error(`Failed to insert data: ${error.message}`)
-			} else {
-				throw new Error('Failed to insert data: Unknown error')
-			}
+			wrapError(error, 'Failed to insert data')
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// Execute SQL queries against GridDB
 	async function searchData(queries: Query[]): Promise<any> {
-		try {
-			if (!Array.isArray(queries) || queries.length === 0) {
-				throw new Error('Queries must be a non-empty array of SQL query objects.')
-			}
+		if (!Array.isArray(queries) || queries.length === 0) {
+			throw new Error('Queries must be a non-empty array of SQL query objects.')
+		}
 
+		try {
 			return await makeRequest('/sql', queries)
 		} catch (error) {
-			if (error instanceof Error) {
-				throw new Error(`Failed to search data: ${error.message}`)
-			} else {
-				throw new Error('Failed to search data: Unknown error')
-			}
+			wrapError(error, 'Failed to search data')
 		}
 	}
 
-	return {
-		createContainer,
-		insertData,
-		searchData,
-	}
+	return { createContainer, insertData, searchData }
 }
