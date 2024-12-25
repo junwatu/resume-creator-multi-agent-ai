@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button"
+import ResumeCreator from "./ResumeCreator"
 
 export default function Home() {
   return (
     <div>
-      <Button>Click me</Button>
+      <ResumeCreator />
     </div>
   )
 }
