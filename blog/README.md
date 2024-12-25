@@ -4,6 +4,8 @@
 
 Photo by <a href="https://unsplash.com/@joaofferrao?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">João Ferrão</a> on <a href="https://unsplash.com/photos/white-printer-paper-on-macbook-pro-4YzrcDNcRVg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
 
+In this blog, we will build an AI-powered resume creation system that automates the tedious and time-consuming tasks involved in manual resume creation. By leveraging multi-agent AI systems, we will streamline the process of information gathering, and content writing to produce resumes with minimal human intervention.
+
 ## Limitations of Manual Resume Processing
 
 ### Inefficient Information Gathering
@@ -51,3 +53,7 @@ Here's a brief description:
   - **Resume Crafting**: Combines the structured data with writing capabilities. This the content writing step.
   - **Create Resume**: Generates the content
   - **Final Resume**: Produces the completed document
+
+## User Interface
+
+![user interface](images/resume-creator.png)
