@@ -10,7 +10,7 @@ In this blog, we will build an AI-powered resume creation system that automates 
 
 ### Inefficient Information Gathering
 
-The manual process of collecting and organizing information is time-consuming and requires significant effort. This is in contrast to KaibanJS which can automatically extract structured information from user inputs.
+The manual process of collecting and organizing information is time-consuming and requires significant effort.
 
 ### Inconsistent Formatting
 
@@ -44,8 +44,8 @@ Here's a brief description:
 - The system starts with **User Input** and requires an environment setup that includes **Team Initialization** and **OpenAI API Key**.
 
 - Two AI agents work together:
-  - **Profile Analyst** (Agent AI 1): Handles data extraction from user input, breaking down information into categories like **Name**, **Experience**, **Skills**, **Education**, and **Job History**.
-  - **Resume Writer** (Agent AI 2): Takes the structured information and handles the writing aspect.
+  - **Profile Analyst (Agent AI 1)**: Handles data extraction from user input, breaking down information into categories like **Name**, **Experience**, **Skills**, **Education**, and **Job History**.
+  - **Resume Writer (Agent AI 2)**: Takes the structured information and handles the writing aspect.
 
 - The workflow follows these key steps:
   - **Data Extraction**: Organizes raw user input into. structured categories. This the information gathering step.
