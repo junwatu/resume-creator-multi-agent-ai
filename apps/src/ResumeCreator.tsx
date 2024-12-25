@@ -21,12 +21,16 @@ const ResumeCreator = () => {
 		"I earned a Bachelor of Science in Computer Science from UC Berkeley in 2017 and have been actively contributing to the open-source Go community."
 	);
 
+
+	const BASE_URL = import.meta.env.VITE_API_URL;
+	console.log(`Base URL:`, BASE_URL)
+
 	const handleSubmit = async () => {
 		setIsSubmitting(true);
 		setSubmitStatus(null);
 
 		try {
-			const response = await fetch('http://localhost:3000/api/resumes', {
+			const response = await fetch(`${BASE_URL}/api/resumes`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
