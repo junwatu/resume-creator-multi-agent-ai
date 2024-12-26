@@ -1,4 +1,4 @@
-# Building Resume Creator Using Multi-agent AI System
+# Building Resume Creator with Multi-agent AI
 
 ![cover](images/joao-ferrao-4YzrcDNcRVg-unsplash.jpg)
 
