@@ -22,7 +22,7 @@ const ResumeCreator = () => {
 	);
 
 	const BASE_URL = import.meta.env.VITE_APP_BASE_URL + ":" + import.meta.env.VITE_PORT;
-	console.log(`Base URL:`, BASE_URL)
+	//console.log(`Base URL:`, BASE_URL)
 
 	const handleSubmit = async () => {
 		setIsSubmitting(true);
@@ -41,7 +41,8 @@ const ResumeCreator = () => {
 				throw new Error('Failed to create resume');
 			}
 
-			await response.json();
+			const data = await response.json();
+			console.log(data);
 			setSubmitStatus('success');
 
 		} catch (error) {
