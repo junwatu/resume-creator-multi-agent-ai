@@ -3,11 +3,15 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.VITE_PORT || 3000;
+const host = process.env.VITE_APP_BASE_URL || 'localhost';
 
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+app.use(express.static('public'));
+app.use(express.static('dist'));
 
 // Routes
 // Get all resumes
@@ -43,7 +47,6 @@ app.post('/api/resumes', async (req, res) => {
 	}
 });
 
-
 // Delete resume
 app.delete('/api/resumes/:id', async (req, res) => {
 	try {
@@ -61,6 +64,6 @@ app.use((err, req, res, next) => {
 	res.status(500).json({ error: 'Something broke!' });
 });
 
-app.listen(port, () => {
+app.listen(port, host, () => {
 	console.log(`Server running on port ${port}`);
 });
