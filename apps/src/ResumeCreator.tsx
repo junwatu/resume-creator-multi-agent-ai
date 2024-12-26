@@ -21,8 +21,7 @@ const ResumeCreator = () => {
 		"I earned a Bachelor of Science in Computer Science from UC Berkeley in 2017 and have been actively contributing to the open-source Go community."
 	);
 
-
-	const BASE_URL = import.meta.env.VITE_API_URL;
+	const BASE_URL = import.meta.env.VITE_APP_BASE_URL + ":" + import.meta.env.VITE_PORT;
 	console.log(`Base URL:`, BASE_URL)
 
 	const handleSubmit = async () => {
