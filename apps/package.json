@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "npm run build && node server.js"
+    "start": "npm run build && node server.js",
+    "kaiban": "kaiban run",
+    "kaiban:deploy": "kaiban deploy"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
