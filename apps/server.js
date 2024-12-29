@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { TeamResumeAgent, bioDefault } from "./team.kban.js";
 
 const app = express();
 const port = process.env.VITE_PORT || 3000;
@@ -67,3 +68,32 @@ app.use((err, req, res, next) => {
 app.listen(port, host, () => {
 	console.log(`Server running on port ${port}`);
 });
+
+async function generateResume(aboutMe) {
+	if (!aboutMe) {
+		aboutMe = bioDefault;
+	}
+
+	console.log(`Generating resume..`);
+	console.log('Status: RUNNING');
+
+	try {
+		const output = await TeamAgent.start({ aboutMe });
+		if (output.status === 'FINISHED') {
+			console.log('\nGenerated Resume:');
+			console.log(output.result);
+
+			const { costDetails, llmUsageStats, duration } = output.stats;
+			console.log('\nStats:');
+			console.log(`Duration: ${duration} ms`);
+			console.log(`Total Token Count: ${llmUsageStats.inputTokens + llmUsageStats.outputTokens}`);
+			console.log(`Total Cost: $${costDetails.totalCost.toFixed(4)}`);
+		} else if (output.status === 'BLOCKED') {
+			console.log('Workflow is blocked, unable to complete');
+		}
+	} catch (error) {
+		console.error('Error generating resume:', error);
+	}
+
+	rl.question('\nEnter another topic (or "quit" to exit): ', handleInput);
+}
