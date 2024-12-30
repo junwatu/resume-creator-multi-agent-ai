@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ResumeMarkdownRenderer } from './ResumeMarkdownRenderer.tsx';
 
 const ResumeCreator = () => {
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,9 +21,9 @@ const ResumeCreator = () => {
 		"5. CI/CD Pipeline Optimizer - Automated CI/CD workflows with Go-based scripts, reducing deployment times by 40%.\n\n" +
 		"I earned a Bachelor of Science in Computer Science from UC Berkeley in 2017 and have been actively contributing to the open-source Go community."
 	);
+	const [markdownContent, setMarkdownContent] = useState<string | null>(null);
 
-	const BASE_URL = import.meta.env.VITE_APP_BASE_URL + ":" + import.meta.env.VITE_PORT;
-	//console.log(`Base URL:`, BASE_URL)
+	const BASE_URL = import.meta.env.VITE_APP_BASE_URL + ':' + import.meta.env.VITE_PORT;
 
 	const handleSubmit = async () => {
 		setIsSubmitting(true);
@@ -34,17 +35,16 @@ const ResumeCreator = () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ content: resumeText })
+				body: JSON.stringify({ content: resumeText }),
 			});
 
 			if (!response.ok) {
 				throw new Error('Failed to create resume');
 			}
 
-			const data = await response.json();
-			console.log(data);
+			const aiResume = await response.json();
+			setMarkdownContent(aiResume.data);
 			setSubmitStatus('success');
-
 		} catch (error) {
 			console.error('Error creating resume:', error);
 			setSubmitStatus('error');
@@ -71,33 +71,38 @@ const ResumeCreator = () => {
 				</Alert>
 			)}
 
-			<div className="space-y-6">
-				<h2 className="text-2xl font-semibold">About Me</h2>
+			{markdownContent ? (
+				<ResumeMarkdownRenderer markdown={markdownContent} />
+			) : (
+					<div className="space-y-6">
+						<h2 className="text-2xl font-semibold">About Me</h2>
 
-				<Card className="border-2">
-					<CardContent className="p-6">
-						<p className="text-sm text-gray-600 mb-4">
-							Enter your professional experience, skills, and education. Our AI will help format this into a polished resume.
-						</p>
-						<Textarea
-							value={resumeText}
-							onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setResumeText(e.target.value)}
-							className="min-h-[400px] font-mono"
-							placeholder="Enter your resume content here..."
-						/>
-					</CardContent>
-				</Card>
+						<Card className="border-2">
+							<CardContent className="p-6">
+								<p className="text-sm text-gray-600 mb-4">
+									Enter your professional experience, skills, and education. Our AI will help format this
+									into a polished resume.
+								</p>
+								<Textarea
+									value={resumeText}
+									onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setResumeText(e.target.value)}
+									className="min-h-[400px] font-mono"
+									placeholder="Enter your resume content here..."
+								/>
+							</CardContent>
+						</Card>
 
-				<div className="flex justify-center">
-					<Button
-						onClick={handleSubmit}
-						disabled={isSubmitting}
-						className="bg-green-500 hover:bg-green-600 text-white px-8 py-2 rounded-md"
-					>
-						{isSubmitting ? 'Creating...' : 'Create Resume'}
-					</Button>
-				</div>
-			</div>
+						<div className="flex justify-center">
+							<Button
+								onClick={handleSubmit}
+								disabled={isSubmitting}
+								className="bg-green-500 hover:bg-green-600 text-white px-8 py-2 rounded-md"
+							>
+								{isSubmitting ? 'Creating...' : 'Create Resume'}
+							</Button>
+						</div>
+					</div>
+			)}
 		</div>
 	);
 };
