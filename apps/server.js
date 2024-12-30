@@ -78,7 +78,7 @@ async function generateResume(aboutMe) {
 	console.log('Status: RUNNING');
 
 	try {
-		const output = await TeamAgent.start({ aboutMe });
+		const output = await TeamResumeAgent({ aboutMe });
 		if (output.status === 'FINISHED') {
 			console.log('\nGenerated Resume:');
 			console.log(output.result);
