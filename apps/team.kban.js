@@ -49,7 +49,7 @@ const resumeCreationTask = new Task({
     a detailed and attractive resume. 
     Enrich the resume content by inferring additional details from the provided information.
     Include sections such as a personal summary, detailed work experience, skills, and educational background.`,
-  expectedOutput: `A professionally formatted resume in markdown format, 
+  expectedOutput: `A professionally formatted resume in raw markdown format, 
     ready for submission to potential employers.`,
   agent: resumeWriter
 });
@@ -59,12 +59,9 @@ const team = new Team({
   name: 'Resume Creation Team',
   agents: [profileAnalyst, resumeWriter],
   tasks: [processingTask, resumeCreationTask],
-  inputs: {
-    aboutMe: bioDefault,
-    env: {
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY
-    }
-  });
+  inputs: { aboutMe: bioDefault },
+  env: { OPENAI_API_KEY: process.env.OPENAI_API_KEY }
+});
 
 export { team as TeamResumeAgent, bioDefault };
 
