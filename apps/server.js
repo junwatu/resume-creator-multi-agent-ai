@@ -5,7 +5,10 @@ import { TeamResumeAgent, bioDefault } from "./team.kban.js";
 
 const app = express();
 const port = process.env.VITE_PORT || 3000;
-const host = process.env.VITE_APP_BASE_URL || 'localhost';
+
+const url = new URL(process.env.VITE_APP_BASE_URL);
+const localhost = url.hostname;
+const host = localhost || 'localhost';
 
 app.use(cors());
 app.use(morgan('dev'));
@@ -13,6 +16,68 @@ app.use(express.json());
 
 app.use(express.static('public'));
 app.use(express.static('dist'));
+
+async function generateResume(aboutMe) {
+	if (!aboutMe) {
+		aboutMe = bioDefault;
+	}
+
+	try {
+		const output = await TeamResumeAgent.start({ aboutMe });
+
+		if (output.status === 'FINISHED') {
+			return {
+				status: 'success',
+				result: output.result,
+				stats: {
+					duration: output.stats.duration,
+					tokenCount: output.stats.llmUsageStats.inputTokens + output.stats.llmUsageStats.outputTokens,
+					totalCost: output.stats.costDetails.totalCost
+				}
+			};
+		} else if (output.status === 'BLOCKED') {
+			return {
+				status: 'error',
+				error: 'Workflow is blocked, unable to complete',
+				stats: null
+			};
+		}
+	} catch (error) {
+		return {
+			status: 'error',
+			error: error.message || 'Error generating resume',
+			stats: null
+		};
+	}
+}
+
+app.post('/api/resumes', async (req, res) => {
+	try {
+		const resumeData = req.body || {};
+
+		console.log(resumeData);
+		const result = await generateResume(resumeData.content || undefined);
+		console.log(result);
+		if (result.status === 'success') {
+			const all = {
+				message: 'Resume created successfully',
+				data: result.result,
+				stats: result.stats
+			}
+			res.status(201).json(all);
+		} else {
+			res.status(400).json({
+				message: 'Failed to generate resume',
+				error: result.error
+			});
+		}
+	} catch (error) {
+		res.status(500).json({
+			error: 'Server error while creating resume',
+			details: error.message
+		});
+	}
+});
 
 // Routes
 // Get all resumes
@@ -41,6 +106,7 @@ app.post('/api/resumes', async (req, res) => {
 	try {
 		// code here
 		const resumeData = req.body;
+
 		// TODO: Implement database storage
 		res.status(201).json({ message: 'Resume created', data: resumeData });
 	} catch (error) {
@@ -69,31 +135,3 @@ app.listen(port, host, () => {
 	console.log(`Server running on port ${port}`);
 });
 
-async function generateResume(aboutMe) {
-	if (!aboutMe) {
-		aboutMe = bioDefault;
-	}
-
-	console.log(`Generating resume..`);
-	console.log('Status: RUNNING');
-
-	try {
-		const output = await TeamResumeAgent({ aboutMe });
-		if (output.status === 'FINISHED') {
-			console.log('\nGenerated Resume:');
-			console.log(output.result);
-
-			const { costDetails, llmUsageStats, duration } = output.stats;
-			console.log('\nStats:');
-			console.log(`Duration: ${duration} ms`);
-			console.log(`Total Token Count: ${llmUsageStats.inputTokens + llmUsageStats.outputTokens}`);
-			console.log(`Total Cost: $${costDetails.totalCost.toFixed(4)}`);
-		} else if (output.status === 'BLOCKED') {
-			console.log('Workflow is blocked, unable to complete');
-		}
-	} catch (error) {
-		console.error('Error generating resume:', error);
-	}
-
-	rl.question('\nEnter another topic (or "quit" to exit): ', handleInput);
-}
