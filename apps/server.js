@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { TeamResumeAgent, bioDefault } from "./team.kban.js";
+import { createGridDBClient } from './lib/griddb-client.js';
+import { generateRandomID } from "./lib/randomId.js"
 
 const app = express();
 const port = process.env.VITE_PORT || 3000;
@@ -16,6 +18,16 @@ app.use(express.json());
 
 app.use(express.static('public'));
 app.use(express.static('dist'));
+
+// Init container in db
+const dbConfig = {
+	griddbWebApiUrl: process.env.GRIDDB_WEBAPI_URL,
+	username: process.env.GRIDDB_USERNAME,
+	password: process.env.GRIDDB_PASSWORD,
+}
+
+const dbClient = createGridDBClient(dbConfig);
+dbClient.createContainer();
 
 async function generateResume(aboutMe) {
 	if (!aboutMe) {
@@ -58,11 +70,25 @@ app.post('/api/resumes', async (req, res) => {
 		console.log(resumeData);
 		const result = await generateResume(resumeData.content || undefined);
 		console.log(result);
+
+		const resume = {
+			id: generateRandomID(),
+			rawContent: resumeData.content,
+			formattedContent: result.result,
+			status: result.status,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		}
+
+		// Save resume to database
+		const dbResponse = dbClient.insertData(resume);
+
 		if (result.status === 'success') {
 			const all = {
 				message: 'Resume created successfully',
 				data: result.result,
-				stats: result.stats
+				stats: result.stats,
+				dbStatus: dbResponse
 			}
 			res.status(201).json(all);
 		} else {
