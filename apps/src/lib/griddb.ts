@@ -1,5 +1,3 @@
-import { generateRandomID } from "./utils"
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Query = {
 	type: string
@@ -112,7 +110,7 @@ export function createGridDBClient(config: Config): GridDBClient {
 	}: InsertDataParams): Promise<any> {
 		try {
 			const escapedValues = [
-				generateRandomID(),
+				data.id,
 				data.rawContent,
 				data.formattedContent,
 				data.status,
