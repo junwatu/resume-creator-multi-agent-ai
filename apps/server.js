@@ -27,6 +27,8 @@ const dbConfig = {
 }
 
 const dbClient = createGridDBClient(dbConfig);
+
+// check if container exists
 dbClient.createContainer();
 
 async function generateResume(aboutMe) {
@@ -63,6 +65,7 @@ async function generateResume(aboutMe) {
 	}
 }
 
+// Create new resume
 app.post('/api/resumes', async (req, res) => {
 	try {
 		const resumeData = req.body || {};
@@ -77,11 +80,13 @@ app.post('/api/resumes', async (req, res) => {
 			formattedContent: result.result,
 			status: result.status,
 			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
+			information: JSON.stringify(result.stats),
 		}
 
 		// Save resume to database
-		const dbResponse = dbClient.insertData(resume);
+		const dbResponse = await dbClient.insertData({ data: resume });
+
+		console.log(dbResponse);
 
 		if (result.status === 'success') {
 			const all = {
@@ -109,10 +114,17 @@ app.post('/api/resumes', async (req, res) => {
 // Get all resumes
 app.get('/api/resumes', async (req, res) => {
 	try {
-		// TODO: Implement database query to fetch all resumes
+
+		// Search data
+		const results = await griddb.searchData([
+			{ type: 'sql-select', stmt: 'SELECT * FROM deviceMaster' }
+		]);
+
+		console.log('Search Results:', results);
+
 		res.json({ message: 'Get all resumes' });
 	} catch (error) {
-		res.status(500).json({ error: 'Failed to fetch resumes' });
+		res.status(500).json({ error: error.message });
 	}
 });
 
