@@ -74,13 +74,15 @@ export function createGridDBClient(config) {
 		data,
 		containerName = 'resumes',
 	}) {
+
+		console.log(data);
 		try {
-			const timestamp = data.lastInspection instanceof Date
-				? data.lastInspection.toISOString()
-				: data.lastInspection;
+			const timestamp = data.createdAt instanceof Date
+				? data.createdAt.toISOString()
+				: data.createdAt;
 
 			const escapedValues = [
-				data.id,
+				parseInt(data.id),
 				data.rawContent,
 				data.formattedContent,
 				data.status,
@@ -88,7 +90,7 @@ export function createGridDBClient(config) {
 				data.information,
 			].map(value => value.toString().replace(/'/g, "''"));
 
-			const sql = `insert into ${containerName}(id, rawContent, formattedContent, status, createdAt, information) values('${escapedValues[0]}', '${escapedValues[1]}', '${escapedValues[2]}', '${escapedValues[3]}', TIMESTAMP('${escapedValues[4]}'), '${escapedValues[5]}')`;
+			const sql = `insert into ${containerName}(id, rawContent, formattedContent, status, createdAt, information) values(${escapedValues[0]}, '${escapedValues[1]}', '${escapedValues[2]}', '${escapedValues[3]}', TIMESTAMP('${escapedValues[4]}'), '${escapedValues[5]}')`;
 
 			return await makeRequest('/sql/update', [{ stmt: sql }]);
 		} catch (error) {
