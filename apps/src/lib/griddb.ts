@@ -1,3 +1,5 @@
+import { generateRandomID } from "./utils"
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Query = {
 	type: string
@@ -18,16 +20,12 @@ type GridDBClient = {
 
 type InsertDataParams = {
 	data: {
-		id: string
+		id: number,
 		rawContent: string
 		formattedContent: string
-		version: number
 		status: string
 		createdAt: Date | string
 		updatedAt: Date | string
-		userId: string
-		template: string
-		metadata: string
 	}
 	containerName?: string
 }
@@ -91,16 +89,12 @@ export function createGridDBClient(config: Config): GridDBClient {
 			container_type: 'COLLECTION',
 			rowkey: true,
 			columns: [
-				{ name: 'id', type: 'STRING' },
+				{ name: 'id', type: 'INTEGER' },
 				{ name: 'rawContent', type: 'STRING' },
 				{ name: 'formattedContent', type: 'STRING' },
-				{ name: 'version', type: 'INTEGER' },
 				{ name: 'status', type: 'STRING' },
 				{ name: 'createdAt', type: 'TIMESTAMP' },
 				{ name: 'updatedAt', type: 'TIMESTAMP' },
-				{ name: 'userId', type: 'STRING' },
-				{ name: 'template', type: 'STRING' },
-				{ name: 'metadata', type: 'STRING' },
 			],
 		}
 
@@ -118,19 +112,15 @@ export function createGridDBClient(config: Config): GridDBClient {
 	}: InsertDataParams): Promise<any> {
 		try {
 			const escapedValues = [
-				data.id,
+				generateRandomID(),
 				data.rawContent,
 				data.formattedContent,
-				data.version,
 				data.status,
 				formatDate(data.createdAt),
 				formatDate(data.updatedAt),
-				data.userId,
-				data.template,
-				data.metadata,
 			].map((value) => (typeof value === 'string' ? escapeString(value) : value))
 
-			const sql = `INSERT INTO ${containerName}(id, rawContent, formattedContent, version, status, createdAt, updatedAt, userId, template, metadata) 
+			const sql = `INSERT INTO ${containerName}(id, rawContent, formattedContent, status, createdAt, updatedAt) 
 VALUES('${escapedValues.join("', '")}')`
 
 			return await makeRequest('/sql/update', [{ stmt: sql }])
