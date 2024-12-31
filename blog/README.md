@@ -118,6 +118,16 @@ We will use React to build the user interface for the resume creation system. Wh
 
 ### Save Data to GridDB Cloud Database
 
+```html
+Error: Failed to create GridDB container: HTTP error! status: 403 - <html>
+<head><title>403 Forbidden</title></head>
+<body>
+<center><h1>403 Forbidden</h1></center>
+<hr><center>Microsoft-Azure-Application-Gateway/v2</center>
+</body>
+</html>
+```
+
 ### User Interface
 
 ![user interface](images/resume-creator.png)
