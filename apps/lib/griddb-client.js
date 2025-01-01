@@ -9,9 +9,6 @@
 export function createGridDBClient(config) {
 	const { griddbWebApiUrl, username, password } = config;
 
-	//debug
-	console.log(griddbWebApiUrl, username, password);
-
 	const baseUrl = griddbWebApiUrl;
 	const authToken = Buffer.from(`${username}:${password}`).toString('base64');
 
@@ -63,8 +60,21 @@ export function createGridDBClient(config) {
 			columns,
 		};
 
-		try {
-			return await makeRequest('/containers', payload);
+		const existingContainerUrl = `/containers/${containerName}/info`;
+
+		try { 
+			fetch(`${baseUrl}${existingContainerUrl}`, {
+				method: 'GET',
+				headers: {
+					'Authorization': `Basic ${authToken}`,
+				}
+			}).then(async response => {
+				if (response.status === 404) {
+					return await makeRequest('/containers', payload);
+				} else {
+					console.log(`Container ${containerName} already exists`);
+				}
+			}); 
 		} catch (error) {
 			throw new Error(`Failed to create GridDB container: ${error.message}`);
 		}
