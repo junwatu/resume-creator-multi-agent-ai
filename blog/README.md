@@ -108,13 +108,99 @@ We will use React to build the user interface for the resume creation system. Wh
 
 ## Building the Resume Creation System
 
-### Server Setup
+### Node.js Server
+
+We will use Node.js to build the server that handles the communication between the user interface, AI agents, and OpenAI API. The server will also store the structured information into the GridDB Cloud database.
+
+This table provides an overview of the API routes defined in the `server.js` code, including HTTP methods, endpoints, descriptions, and any parameters.
+
+| HTTP Method | Endpoint             | Description                                     | Parameters                    |
+|-------------|----------------------|-------------------------------------------------|--------------------------------|
+| POST        | `/api/resumes`       | Creates a new resume. Calls the `generateResume` function to generate content, saves to the database, and returns the response. | **Body**: `{ content: string }` |
+| GET         | `/api/resumes`       | Fetches all resumes stored in the database.     | None                          |
+| GET         | `/api/resumes/:id`   | Fetches a specific resume by its ID.            | **Path**: `id` (Resume ID)    |
+| DELETE      | `/api/resumes/:id`   | Deletes a specific resume by its ID.            | **Path**: `id` (Resume ID)    |
+
+The main route code for the resume creation is as follows:
+
+```javascript
+app.post('/api/resumes', async (req, res) => {
+ try {
+  const resumeData = req.body || {};
+  const result = await generateResume(resumeData.content || undefined);
+  console.log(result);
+
+  const resume = {
+   id: generateRandomID(),
+   rawContent: resumeData.content,
+   formattedContent: result.result,
+   status: result.status,
+   createdAt: new Date().toISOString(),
+   information: JSON.stringify(result.stats),
+  }
+
+  // Save resume to database
+  const dbResponse = await dbClient.insertData({ data: resume });
+
+  if (result.status === 'success') {
+   const all = {
+    message: 'Resume created successfully',
+    data: result.result,
+    stats: result.stats,
+    dbStatus: dbResponse
+   }
+   res.status(201).json(all);
+  } else {
+   res.status(400).json({
+    message: 'Failed to generate resume',
+    error: result.error
+   });
+  }
+ } catch (error) {
+  res.status(500).json({
+   error: 'Server error while creating resume',
+   details: error.message
+  });
+ }
+});
+```
+
+When the user submits their data, the server calls the `generateResume` function to generate the resume content. The result is then saved to the GridDB Cloud database and also returned the resume content as a response.
 
 ### Multi-agent AI
 
+We will use KaibanJS to build the multi-agent AI system for the resume creation process. The system consists of two main agents:
+
 #### Profile Analyst (Agent AI 1)
 
+The **Profile Analyst** agent is responsible for extracting structured information from the user input. It categorizes the input into fields such as **Name**, **Experience**, **Skills**, **Education**, and **Job History**. The effectiveness of these fields depends on the quality and diversity of the submitted data.
+
+```js
+const profileAnalyst = new Agent({
+  name: 'Carla Smith',
+  role: 'Profile Analyst',
+  goal: 'Extract structured information from conversational user input.',
+  background: 'Data Processor',
+  tools: []  // Tools are omitted for now
+});
+```
+
 #### Resume Writer (Agent AI 2)
+
+The **Resume Writer** agent is responsible for crafting the resume content based on the structured information provided by the **Profile Analyst** agent. It generates well-structured, compelling content that effectively showcases the user's qualifications and achievements.
+
+```js
+const resumeWriter = new Agent({
+  name: 'Alex Morra',
+  role: 'Resume Writer',
+  goal: `Craft compelling, well-structured resumes 
+    that effectively showcase job seekers qualifications and achievements.`,
+  background: `Extensive experience in recruiting, 
+    copywriting, and human resources, enabling 
+    effective resume design that stands out to employers.`,
+  tools: []
+});
+```
 
 ### Save Data to GridDB Cloud Database
 
