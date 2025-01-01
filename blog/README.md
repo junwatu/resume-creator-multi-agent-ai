@@ -31,6 +31,45 @@ Creating a resume manually involves several steps:
 
 With the AI system, we can automate these steps using multi-agent systems. Each agent performs a specific task, such as extracting information, generating content, or formatting the resume. By coordinating these agents, we can create a fully automated resume creation system.
 
+## Running the Resume Creator
+
+Before we dive into the technical details, you can run the resume creator system by following these steps:
+
+1) Clone the repository:
+
+    ```bash
+    git clone https://github.com/junwatu/resume-creator-multi-agent-ai.git
+    ```
+
+2) Install the dependencies:
+
+    ```bash
+    cd resume-creator-multi-agent-ai
+    cd apps
+    npm install
+    ```
+
+3) Create a `.env` file in the `apps` directory and add the following environment variables:
+
+    ```ini
+    OPENAI_API_KEY=api-key-here
+    GRIDDB_WEBAPI_URL=
+    GRIDDB_USERNAME=
+    GRIDDB_PASSWORD=
+    VITE_APP_BASE_URL=http://localhost
+    VITE_PORT=3000
+    ```
+
+    Please refer to the [Prerequisites](#prerequisites) section for more details on obtaining the OpenAI API key and GridDB credentials.
+
+4) Start the server:
+
+    ```bash
+    npm run start
+    ```
+
+5) Open your browser and go to `http://localhost:3000` to access the resume creator system.
+
 ## How it Works?
 
 In this blog, we automate the **information gathering** and **content writing** for the resume, tasks that are usually manual and time-consuming.
@@ -197,7 +236,7 @@ const processingTask = new Task({
 });
 ```
 
-The `expectedOutput` is the structured data that will be used by the **Resume Writer** agent to generate the resume content. 
+The `expectedOutput` is the structured data that will be used by the **Resume Writer** agent to generate the resume content.
 
 The `description` and `expectedOutput` mimic the prompts if were interact with ChatGPT. However, in this case, this done by the **Profile Analyst** agent.
 
