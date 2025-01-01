@@ -185,6 +185,22 @@ const profileAnalyst = new Agent({
 });
 ```
 
+This profile agent will use this task code to extract user data:
+
+```js
+const processingTask = new Task({
+  description: `Extract relevant details such as name, 
+  experience, skills, and job history from the user's 'aboutMe' input. 
+  aboutMe: {aboutMe}`,
+  expectedOutput: 'Structured data ready to be used for a resume creation.',
+  agent: profileAnalyst
+});
+```
+
+The `expectedOutput` is the structured data that will be used by the **Resume Writer** agent to generate the resume content. 
+
+The `description` and `expectedOutput` mimic the prompts if were interact with ChatGPT. However, in this case, this done by the **Profile Analyst** agent.
+
 #### Resume Writer (Agent AI 2)
 
 The **Resume Writer** agent is responsible for crafting the resume content based on the structured information provided by the **Profile Analyst** agent. It generates well-structured, compelling content that effectively showcases the user's qualifications and achievements.
@@ -201,6 +217,21 @@ const resumeWriter = new Agent({
   tools: []
 });
 ```
+
+This resume agent will use this task code to generate the resume content:
+
+```js
+const resumeCreationTask = new Task({
+  description: `Utilize the structured data to create 
+    a detailed and attractive resume. 
+    Enrich the resume content by inferring additional details from the provided information.
+    Include sections such as a personal summary, detailed work experience, skills, and educational background.`,
+  expectedOutput: `A professionally formatted resume in raw markdown format, ready for submission to potential employers`,
+  agent: resumeWriter
+});
+```
+
+The result of this task is markdown-formatted resume content that can be easily converted into a PDF or other formats and it easy to process by the user interface.
 
 ### Save Data to GridDB Cloud Database
 
