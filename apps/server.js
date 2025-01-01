@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { TeamResumeAgent, bioDefault } from "./team.kban.js";
 import { createGridDBClient } from './lib/griddb-client.js';
-import { generateRandomID } from "./lib/randomId.js"
+import { generateRandomID } from "./lib/randomId.js";
 
 const app = express();
 const port = process.env.VITE_PORT || 3000;
@@ -19,7 +19,6 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.static('dist'));
 
-// Init container in db
 const dbConfig = {
 	griddbWebApiUrl: process.env.GRIDDB_WEBAPI_URL,
 	username: process.env.GRIDDB_USERNAME,
@@ -27,8 +26,6 @@ const dbConfig = {
 }
 
 const dbClient = createGridDBClient(dbConfig);
-
-// check if container exists
 dbClient.createContainer();
 
 async function generateResume(aboutMe) {
@@ -65,7 +62,6 @@ async function generateResume(aboutMe) {
 	}
 }
 
-// Create new resume
 app.post('/api/resumes', async (req, res) => {
 	try {
 		const resumeData = req.body || {};
@@ -110,60 +106,47 @@ app.post('/api/resumes', async (req, res) => {
 	}
 });
 
-// Routes
-// Get all resumes
 app.get('/api/resumes', async (req, res) => {
 	try {
-
-		// Search data
-		const results = await griddb.searchData([
-			{ type: 'sql-select', stmt: 'SELECT * FROM deviceMaster' }
+		// Search all data
+		const results = await dbClient.searchData([
+			{ type: 'sql-select', stmt: 'SELECT * FROM resumes' }
 		]);
 
-		console.log('Search Results:', results);
-
-		res.json({ message: 'Get all resumes' });
+		res.json({ data: results });
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
 });
 
-// Get single resume
 app.get('/api/resumes/:id', async (req, res) => {
 	try {
 		const { id } = req.params;
-		// TODO: Implement database query to fetch specific resume
-		res.json({ message: `Get resume ${id}` });
+		// SQL to search data by id
+		const results = await dbClient.searchData([
+			{ type: 'sql-select', stmt: `SELECT * FROM resumes WHERE id=${id}` }
+		]);
+
+		res.json({ data: results });
 	} catch (error) {
-		res.status(500).json({ error: 'Failed to fetch resume' });
+		res.status(500).json({ error: `Failed to fetch resume with id ${id}` });
 	}
 });
 
-// Create new resume
-app.post('/api/resumes', async (req, res) => {
-	try {
-		// code here
-		const resumeData = req.body;
-
-		// TODO: Implement database storage
-		res.status(201).json({ message: 'Resume created', data: resumeData });
-	} catch (error) {
-		res.status(500).json({ error: 'Failed to create resume' });
-	}
-});
-
-// Delete resume
 app.delete('/api/resumes/:id', async (req, res) => {
 	try {
 		const { id } = req.params;
-		// TODO: Implement database deletion
+
+		const results = await dbClient.searchData([
+			{ type: 'sql-select', stmt: `DELETE FROM resumes WHERE id=${id}` }
+		]);
+
 		res.json({ message: `Resume ${id} deleted` });
 	} catch (error) {
-		res.status(500).json({ error: 'Failed to delete resume' });
+		res.status(500).json({ error: `Failed to delete resume with id ${id}` });
 	}
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
 	console.error(err.stack);
 	res.status(500).json({ error: 'Something broke!' });
@@ -172,4 +155,3 @@ app.use((err, req, res, next) => {
 app.listen(port, host, () => {
 	console.log(`Server running on port ${port}`);
 });
-
