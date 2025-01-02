@@ -442,9 +442,17 @@ const ResumeCreator = () => {
 export default ResumeCreator;
 ```
 
-When the user submits their data, the backend processes it, and the final resume content is returned to the user interface and displayed on the screen by the `ResumeMarkdownRenderer` component.
+The core functionality of the `ResumeCreator` component is to create a user resume using AI and render the result. It uses `useState` to manage input (`resumeText`), generated markdown (`markdownContent`), submission status (`submitStatus`), and submission progress (`isSubmitting`). The `handleSubmit` function sends a POST request to the `/api/resumes` route at the backend (`${BASE_URL}/api/resumes`), passing the user's input, and updates the state based on the API's response.
+
+The UI includes a text area for input, a submit button to trigger the API call, and a markdown renderer `ResumeMarkdownRenderer` component to display the AI-generated resume. Alerts notify the user of the submission status, while loading states ensure a smooth experience.
 
 ![resume formatted](images/resume-formatted.png)
+
+## Further Improvements
+
+- **Enhanced Data Extraction**: Improve the **Profile Analyst** agent's ability to extract and categorize information more accurately and efficiently.
+- **Advanced Content Generation**: Enhance the **Resume Writer** agent's content generation capabilities to produce more compelling and personalized resumes.
+- **User Interface Enhancements**: Add more features to the user interface, such as resume templates, customization options, and real-time editing.
 
 ## Conclusion
 
