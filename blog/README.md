@@ -338,3 +338,114 @@ All these data operations will be handled by the Node.js server and exposed as A
 ### User Interface
 
 ![user interface](images/resume-creator.png)
+
+The `ResumeCreator` component is built using React and allows users to input their details in a text and generate a resume with the click of a button. The user interface is designed to be simple.
+
+```jsx
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ResumeMarkdownRenderer } from './ResumeMarkdownRenderer.tsx';
+
+const ResumeCreator = () => {
+ const [isSubmitting, setIsSubmitting] = useState(false);
+ const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
+ const [resumeText, setResumeText] = useState("default resume text");
+ const [markdownContent, setMarkdownContent] = useState<string | null>(null);
+
+ const BASE_URL = import.meta.env.VITE_APP_BASE_URL + ':' + import.meta.env.VITE_PORT;
+
+ const handleSubmit = async () => {
+  setIsSubmitting(true);
+  setSubmitStatus(null);
+
+  try {
+   const response = await fetch(`${BASE_URL}/api/resumes`, {
+    method: 'POST',
+    headers: {
+     'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ content: resumeText }),
+   });
+
+   if (!response.ok) {
+    throw new Error('Failed to create resume');
+   }
+
+   const aiResume = await response.json();
+   setMarkdownContent(aiResume.data);
+   setSubmitStatus('success');
+  } catch (error) {
+   console.error('Error creating resume:', error);
+   setSubmitStatus('error');
+  } finally {
+   setIsSubmitting(false);
+   setTimeout(() => setSubmitStatus(null), 5000);
+  }
+ };
+
+ return (
+  <div className="max-w-4xl mx-auto p-8 space-y-6">
+   <h1 className="text-3xl font-bold text-center">
+    Resume Creator
+    <div className="w-40 h-1 bg-green-500 mx-auto mt-1"></div>
+   </h1>
+
+   {submitStatus && (
+    <Alert className={submitStatus === 'success' ? 'bg-green-50' : 'bg-red-50'}>
+     <AlertDescription>
+      {submitStatus === 'success'
+       ? 'Resume created successfully!'
+       : 'Failed to create resume. Please try again.'}
+     </AlertDescription>
+    </Alert>
+   )}
+
+   {markdownContent ? (
+    <ResumeMarkdownRenderer markdown={markdownContent} />
+   ) : (
+     <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">About Me</h2>
+
+      <Card className="border-2">
+       <CardContent className="p-6">
+        <p className="text-sm text-gray-600 mb-4">
+         Enter your professional experience, skills, and education. Our AI will help format this
+         into a polished resume.
+        </p>
+        <Textarea
+         value={resumeText}
+         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setResumeText(e.target.value)}
+         className="min-h-[400px] font-mono"
+         placeholder="Enter your resume content here..."
+        />
+       </CardContent>
+      </Card>
+
+      <div className="flex justify-center">
+       <Button
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+        className="bg-green-500 hover:bg-green-600 text-white px-8 py-2 rounded-md"
+       >
+        {isSubmitting ? 'Creating...' : 'Create Resume'}
+       </Button>
+      </div>
+     </div>
+   )}
+  </div>
+ );
+};
+
+export default ResumeCreator;
+```
+
+When the user submits their data, the backend processes it, and the final resume content is returned to the user interface and displayed on the screen by the `ResumeMarkdownRenderer` component.
+
+![resume formatted](images/resume-formatted.png)
+
+## Conclusion
+
+In this blog, we have built an AI-powered resume creation system that automates the tedious and time-consuming tasks involved in manual resume creation. By leveraging multi-agent AI systems, we have streamlined the process of information gathering and content writing to produce resumes with minimal human intervention.
