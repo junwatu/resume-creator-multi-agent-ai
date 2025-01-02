@@ -4,7 +4,7 @@
 
 Photo by [João Ferrão](https://unsplash.com/@joaofferrao?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash) on [Unsplash](https://unsplash.com/photos/white-printer-paper-on-macbook-pro-4YzrcDNcRVg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash)
 
-In this blog, we will build an AI-powered resume creation system that automates the tedious and time-consuming tasks involved in manual resume creation. By leveraging multi-agent AI systems, we will streamline the process of information gathering, and content writing to produce resumes with minimal human intervention.
+In this blog, we will build an AI-powered resume-creation system that automates the tedious and time-consuming tasks involved in manual resume creation. By leveraging multi-agent AI systems, we will streamline the process of information gathering, and content writing to produce resumes with minimal human intervention.
 
 ## Limitations of Manual Resume Processing
 
@@ -84,12 +84,12 @@ Here's a brief description:
 
 - Two AI agents work together:
   - **Profile Analyst (Agent AI 1)**: Handles data extraction from user input, breaking down information into categories like **Name**, **Experience**, **Skills**, **Education**, and **Job History**.
-  - **Resume Writer (Agent AI 2)**: Takes the structured information and handles the writing aspect.
+  - **Resume Writer (Agent AI 2)**: Takes structured information and handles the writing aspect.
 
 - The workflow follows these key steps:
-  - **Data Extraction**: Organizes raw user input into. structured categories. This the information gathering step.
+  - **Data Extraction**: Organizes raw user input into. structured categories. This is the information-gathering step.
   - **Structured Information**: Stores the organized data into the GridDB Cloud database.
-  - **Resume Crafting**: Combines the structured data with writing capabilities. This the content writing step.
+  - **Resume Crafting**: Combines the structured data with writing capabilities. This is the content writing step.
   - **Create Resume**: Generates the content.
   - **Final Resume**: Produces the completed document.
 
@@ -131,7 +131,7 @@ Go to the GridDB Cloud portal and copy the WebAPI URL from the **Clusters** sect
 
 #### GridDB Username and Password
 
-Go to the **GridDB Users** section of the GridDB Cloud portal and cretae or copy the username for `GRIDDB_USERNAME`. The password is set when the user is created for the first time, use this as the `GRIDDB_PASSWORD`.
+Go to the **GridDB Users** section of the GridDB Cloud portal and create or copy the username for `GRIDDB_USERNAME`. The password is set when the user is created for the first time, use this as the `GRIDDB_PASSWORD`.
 
 ![GridDB Users](images/griddb-cloud-users.png)
 
@@ -139,17 +139,17 @@ For more details, to get started with GridDB Cloud, please follow this [quick st
 
 ### Node.js
 
-We will use Node.js LTS v22.12.0 to build a server that handles the communication between the user interface, AI agents and OpenAI API and store data into the GridDB Cloud database.
+We will use Node.js LTS v22.12.0 to build a server that handles the communication between the user interface, AI agents, and OpenAI API and store data in the GridDB Cloud database.
 
 ### React
 
-We will use React to build the user interface for the resume creation system. Where the user can input their details and generate a resume with click of a button.
+We will use React to build the user interface for the resume creation system. Where the user can input their details and generate a resume with a click of a button.
 
 ## Building the Resume Creation System
 
 ### Node.js Server
 
-We will use Node.js to build the server that handles the communication between the user interface, AI agents, and OpenAI API. The server will also store the structured information into the GridDB Cloud database.
+We will use Node.js to build the server that handles the communication between the user interface, AI agents, and OpenAI API. The server will also store the structured information in the GridDB Cloud database.
 
 This table provides an overview of the API routes defined in the `server.js` code, including HTTP methods, endpoints, descriptions, and any parameters.
 
@@ -238,7 +238,7 @@ const processingTask = new Task({
 
 The `expectedOutput` is the structured data that will be used by the **Resume Writer** agent to generate the resume content.
 
-The `description` and `expectedOutput` mimic the prompts if were interact with ChatGPT. However, in this case, this done by the **Profile Analyst** agent.
+The `description` and `expectedOutput` mimic the prompts if were interact with ChatGPT. However, in this case, this is done by the **Profile Analyst** agent.
 
 #### Resume Writer (Agent AI 2)
 
@@ -302,7 +302,7 @@ GridDB Cloud provides a [RESTful API](https://www.toshiba-sol.co.jp/pro/griddbcl
 
 The `griddb-client.js` file contains the code to interact with the GridDB Cloud database. It includes functions to insert, retrieve, and delete resume data.
 
-GridDB also support SQL-like queries to interact with the database. Here's an example of a SQL query to retrieve all resumes from the database:
+GridDB also supports SQL-like queries to interact with the database. Here's an example of an SQL query to retrieve all resumes from the database:
 
 ```sql
 SELECT * FROM resumes;
@@ -331,7 +331,7 @@ const response = await fetch(`${process.env.GRIDDB_WEBAPI_URL}'/sql/update'`, {
   const responseText = await response.text();
 ```
 
-The code above inserts the resume data into the GridDB Cloud database using `/sql/update` endpoint and the SQL query.
+The code above inserts the resume data into the GridDB Cloud database using the `/sql/update` endpoint and the SQL query.
 
 All these data operations will be handled by the Node.js server and exposed as API endpoints for the user interface to interact with.
 
@@ -448,4 +448,4 @@ When the user submits their data, the backend processes it, and the final resume
 
 ## Conclusion
 
-In this blog, we have built an AI-powered resume creation system that automates the tedious and time-consuming tasks involved in manual resume creation. By leveraging multi-agent AI systems, we have streamlined the process of information gathering and content writing to produce resumes with minimal human intervention.
+In this blog, we have built an AI-powered resume-creation system that automates the tedious and time-consuming tasks involved in manual resume creation. By leveraging multi-agent AI systems, we have streamlined the process of information gathering and content writing to produce resumes with minimal human intervention.
