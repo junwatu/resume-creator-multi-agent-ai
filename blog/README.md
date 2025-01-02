@@ -289,17 +289,51 @@ This is the schema data used to store the resume information in the GridDB Cloud
 }
 ```
 
+| Field              | Type   | Description                                                                            |
+|--------------------|--------|----------------------------------------------------------------------------------------|
+| `id`              | string | A unique identifier for each resume.                                                   |
+| `rawContent`      | string | The original user input for the resume.                                                |
+| `formattedContent`| string | The final formatted resume content.                                                    |
+| `status`          | string | Indicates the success or failure of the resume generation process.                     |
+| `createdAt`       | string | The timestamp of when the resume was created.                                          |
+| `information`     | string | The OpenAI token information.            |
 
+GridDB Cloud provides a [RESTful API](https://www.toshiba-sol.co.jp/pro/griddbcloud/docs-en/v2_5/reference_web_api_html/GridDB_Web_API_Reference.html) that allows us to interact with the database. We will use this API to store and retrieve the resume information.
 
-```html
-Error: Failed to create GridDB container: HTTP error! status: 403 - <html>
-<head><title>403 Forbidden</title></head>
-<body>
-<center><h1>403 Forbidden</h1></center>
-<hr><center>Microsoft-Azure-Application-Gateway/v2</center>
-</body>
-</html>
+The `griddb-client.js` file contains the code to interact with the GridDB Cloud database. It includes functions to insert, retrieve, and delete resume data.
+
+GridDB also support SQL-like queries to interact with the database. Here's an example of a SQL query to retrieve all resumes from the database:
+
+```sql
+SELECT * FROM resumes;
 ```
+
+and to retrieve a specific resume by its ID:
+
+```sql
+SELECT * FROM resumes WHERE id = 'resume-id';
+```
+
+Let's take an example how to insert data into the GridDB Cloud database:
+
+```js
+const sql = "insert into resumes (id, rawContent, formattedContent, status, createdAt, information) values(3, 'raw contenct here', ' formatted content here', 'success', TIMESTAMP('2025-01-02'), '{tokens: 300}')";
+
+const response = await fetch(`${process.env.GRIDDB_WEBAPI_URL}'/sql/update'`, {
+   method: 'POST',
+   headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Basic ${authToken}`,
+   },
+   body: JSON.stringify(payload),
+  });
+
+  const responseText = await response.text();
+```
+
+The code above inserts the resume data into the GridDB Cloud database using `/sql/update` endpoint and the SQL query.
+
+All these data operations will be handled by the Node.js server and exposed as API endpoints for the user interface to interact with.
 
 ### User Interface
 
