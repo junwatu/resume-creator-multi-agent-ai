@@ -125,7 +125,7 @@ Check the below section on how to get these values.
 
 #### GridDB WebAPI URL
 
-Go to the GridDB Cloud portal and copy the WebAPI URL from the **Clusters** section. It should look like this:
+Go to the [GridDB Cloud portal](https://cloud5197.griddb.com/portal5197/login/#/) and copy the WebAPI URL from the **Clusters** section. It should look like this:
 
 ![GridDB Portal](images/griddb-cloud-portal.png)
 
@@ -442,7 +442,7 @@ const ResumeCreator = () => {
 export default ResumeCreator;
 ```
 
-The core functionality of the `ResumeCreator` component is to create a user resume using AI and render the result. It uses `useState` to manage input (`resumeText`), generated markdown (`markdownContent`), submission status (`submitStatus`), and submission progress (`isSubmitting`). The `handleSubmit` function sends a POST request to the `/api/resumes` route at the backend (`${BASE_URL}/api/resumes`), passing the user's input, and updates the state based on the API's response.
+The core functionality of the `ResumeCreator` component is to create a user resume using AI and render the result. It uses `useState` to manage input (`resumeText`), generated markdown (`markdownContent`), submission status (`submitStatus`), and submission progress (`isSubmitting`). The `handleSubmit` function sends a POST request to the `/api/resumes` route at the backend (`${BASE_URL}/api/resumes`), passing the user's input, and updates the state based on the API's response. Read [here](#nodejs-server) for the Node.js API routes.
 
 The UI includes a text area for input, a submit button to trigger the API call, and a markdown renderer `ResumeMarkdownRenderer` component to display the AI-generated resume. Alerts notify the user of the submission status while loading states to ensure a smooth experience.
 
