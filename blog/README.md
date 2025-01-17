@@ -60,7 +60,7 @@ Before we dive into the technical details, you can run the resume creator system
     VITE_PORT=3000
     ```
 
-    Please refer to the [Prerequisites](#prerequisites) section for more details on obtaining the OpenAI API key and GridDB credentials.
+ Please refer to the [Prerequisites](#prerequisites) section for more details on obtaining the OpenAI API key and GridDB credentials.
 
 4) Start the server:
 
@@ -87,7 +87,7 @@ Here's a brief description:
   - **Resume Writer (Agent AI 2)**: Takes structured information and handles the writing aspect.
 
 - The workflow follows these key steps:
-  - **Data Extraction**: Organizes raw user input into. structured categories. This is the information-gathering step.
+  - **Data Extraction**: Organizes raw user input into structured categories. This is the information-gathering step.
   - **Structured Information**: Stores the organized data into the GridDB Cloud database.
   - **Resume Crafting**: Combines the structured data with writing capabilities. This is the content writing step.
   - **Create Resume**: Generates the content.
@@ -176,7 +176,7 @@ app.post('/api/resumes', async (req, res) => {
    status: result.status,
    createdAt: new Date().toISOString(),
    information: JSON.stringify(result.stats),
-  }
+ }
 
   // Save resume to database
   const dbResponse = await dbClient.insertData({ data: resume });
@@ -187,24 +187,24 @@ app.post('/api/resumes', async (req, res) => {
     data: result.result,
     stats: result.stats,
     dbStatus: dbResponse
-   }
+ }
    res.status(201).json(all);
-  } else {
+ } else {
    res.status(400).json({
     message: 'Failed to generate resume',
     error: result.error
-   });
-  }
+ });
+ }
  } catch (error) {
   res.status(500).json({
    error: 'Server error while creating resume',
    details: error.message
-  });
+ });
  }
 });
 ```
 
-When the user submits their data, the server calls the `generateResume` function to generate the resume content. The result is then saved to the GridDB Cloud database and also returned the resume content as a response.
+When the user submits their data, the server calls the `generateResume` function to generate the resume content. The result is then saved to the GridDB Cloud database, and the resume content is returned as a response.
 
 ### Multi-agent AI
 
@@ -229,8 +229,8 @@ This profile agent will use this task code to extract user data:
 ```js
 const processingTask = new Task({
   description: `Extract relevant details such as name, 
-  experience, skills, and job history from the user's 'aboutMe' input. 
-  aboutMe: {aboutMe}`,
+ experience, skills, and job history from the user's 'aboutMe' input. 
+ aboutMe: {aboutMe}`,
   expectedOutput: 'Structured data ready to be used for a resume creation.',
   agent: profileAnalyst
 });
@@ -249,10 +249,10 @@ const resumeWriter = new Agent({
   name: 'Alex Morra',
   role: 'Resume Writer',
   goal: `Craft compelling, well-structured resumes 
-    that effectively showcase job seekers qualifications and achievements.`,
+ that effectively showcase job seekers qualifications and achievements.`,
   background: `Extensive experience in recruiting, 
-    copywriting, and human resources, enabling 
-    effective resume design that stands out to employers.`,
+ copywriting, and human resources, enabling 
+ effective resume design that stands out to employers.`,
   tools: []
 });
 ```
@@ -262,9 +262,9 @@ This resume agent will use this task code to generate the resume content:
 ```js
 const resumeCreationTask = new Task({
   description: `Utilize the structured data to create 
-    a detailed and attractive resume. 
-    Enrich the resume content by inferring additional details from the provided information.
-    Include sections such as a personal summary, detailed work experience, skills, and educational background.`,
+ a detailed and attractive resume. 
+ Enrich the resume content by inferring additional details from the provided information.
+ Include sections such as a personal summary, detailed work experience, skills, and educational background.`,
   expectedOutput: `A professionally formatted resume in raw markdown format, ready for submission to potential employers`,
   agent: resumeWriter
 });
@@ -366,30 +366,30 @@ const ResumeCreator = () => {
     method: 'POST',
     headers: {
      'Content-Type': 'application/json',
-    },
+ },
     body: JSON.stringify({ content: resumeText }),
-   });
+ });
 
    if (!response.ok) {
     throw new Error('Failed to create resume');
-   }
+ }
 
    const aiResume = await response.json();
    setMarkdownContent(aiResume.data);
    setSubmitStatus('success');
-  } catch (error) {
+ } catch (error) {
    console.error('Error creating resume:', error);
    setSubmitStatus('error');
-  } finally {
+ } finally {
    setIsSubmitting(false);
    setTimeout(() => setSubmitStatus(null), 5000);
-  }
+ }
  };
 
  return (
   <div className="max-w-4xl mx-auto p-8 space-y-6">
    <h1 className="text-3xl font-bold text-center">
-    Resume Creator
+ Resume Creator
     <div className="w-40 h-1 bg-green-500 mx-auto mt-1"></div>
    </h1>
 
@@ -412,8 +412,8 @@ const ResumeCreator = () => {
       <Card className="border-2">
        <CardContent className="p-6">
         <p className="text-sm text-gray-600 mb-4">
-         Enter your professional experience, skills, and education. Our AI will help format this
-         into a polished resume.
+ Enter your professional experience, skills, and education. Our AI will help format this
+ into a polished resume.
         </p>
         <Textarea
          value={resumeText}
@@ -444,7 +444,7 @@ export default ResumeCreator;
 
 The core functionality of the `ResumeCreator` component is to create a user resume using AI and render the result. It uses `useState` to manage input (`resumeText`), generated markdown (`markdownContent`), submission status (`submitStatus`), and submission progress (`isSubmitting`). The `handleSubmit` function sends a POST request to the `/api/resumes` route at the backend (`${BASE_URL}/api/resumes`), passing the user's input, and updates the state based on the API's response.
 
-The UI includes a text area for input, a submit button to trigger the API call, and a markdown renderer `ResumeMarkdownRenderer` component to display the AI-generated resume. Alerts notify the user of the submission status, while loading states ensure a smooth experience.
+The UI includes a text area for input, a submit button to trigger the API call, and a markdown renderer `ResumeMarkdownRenderer` component to display the AI-generated resume. Alerts notify the user of the submission status while loading states to ensure a smooth experience.
 
 ![resume formatted](images/resume-formatted.png)
 
