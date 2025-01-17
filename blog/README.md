@@ -123,9 +123,15 @@ GRIDDB_PASSWORD=
 
 Check the below section on how to get these values.
 
+#### Sign Up for GridDB Cloud Free Plan
+
+If you would like to sign up for a GridDB Cloud Free instance, you can do so in the following link: [https://form.ict-toshiba.jp/download_form_griddb_cloud_freeplan_e](https://form.ict-toshiba.jp/download_form_griddb_cloud_freeplan_e).
+
+After successfully signing up, you will receive a free instance along with the necessary details to access the GridDB Cloud Management GUI, including the **GridDB Cloud Portal URL**, **Contract ID**, **Login**, and **Password**.
+
 #### GridDB WebAPI URL
 
-Go to the [GridDB Cloud portal](https://cloud5197.griddb.com/portal5197/login/#/) and copy the WebAPI URL from the **Clusters** section. It should look like this:
+Go to the GridDB Cloud Portal and copy the WebAPI URL from the **Clusters** section. It should look like this:
 
 ![GridDB Portal](images/griddb-cloud-portal.png)
 
