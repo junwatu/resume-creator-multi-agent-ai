@@ -143,6 +143,15 @@ Go to the **GridDB Users** section of the GridDB Cloud portal and create or copy
 
 For more details, to get started with GridDB Cloud, please follow this [quick start guide](https://griddb.net/en/blog/griddb-cloud-quick-start-guide/).
 
+#### IP Whitelist
+When running this project, please ensure that the IP address where the project is running is whitelisted. Failure to do so will result in a 403 status code or forbidden access.
+
+You can use a website like [What Is My IP Address](https://whatismyipaddress.com/) to find your public IP address.
+
+To whitelist the IP, go to the GridDB Cloud Admin and navigate to the **Network Access** menu.
+
+![ip whitelist](images/ip-whitelist.png)
+
 ### Node.js
 
 We will use Node.js LTS v22.12.0 to build a server that handles the communication between the user interface, AI agents, and OpenAI API and store data in the GridDB Cloud database.
