@@ -67,8 +67,8 @@ app.post('/api/resumes', async (req, res) => {
 		const resumeData = req.body || {};
 
 		console.log(resumeData);
+
 		const result = await generateResume(resumeData.content || undefined);
-		console.log(result);
 
 		const resume = {
 			id: generateRandomID(),
@@ -99,6 +99,7 @@ app.post('/api/resumes', async (req, res) => {
 			});
 		}
 	} catch (error) {
+		console.error(error);
 		res.status(500).json({
 			error: 'Server error while creating resume',
 			details: error.message
@@ -110,7 +111,7 @@ app.get('/api/resumes', async (req, res) => {
 	try {
 		// Search all data
 		const results = await dbClient.searchData([
-			{ type: 'sql-select', stmt: 'SELECT * FROM resumes' }
+			{ stmt: 'SELECT * FROM resumes' }
 		]);
 
 		res.json({ data: results });
@@ -124,7 +125,7 @@ app.get('/api/resumes/:id', async (req, res) => {
 		const { id } = req.params;
 		// SQL to search data by id
 		const results = await dbClient.searchData([
-			{ type: 'sql-select', stmt: `SELECT * FROM resumes WHERE id=${id}` }
+			{ stmt: `SELECT * FROM resumes WHERE id=${id}` }
 		]);
 
 		res.json({ data: results });
@@ -138,7 +139,7 @@ app.delete('/api/resumes/:id', async (req, res) => {
 		const { id } = req.params;
 
 		const results = await dbClient.searchData([
-			{ type: 'sql-select', stmt: `DELETE FROM resumes WHERE id=${id}` }
+			{ stmt: `DELETE FROM resumes WHERE id=${id}` }
 		]);
 
 		res.json({ message: `Resume ${id} deleted` });
