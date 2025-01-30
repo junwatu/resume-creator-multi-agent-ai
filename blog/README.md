@@ -366,7 +366,7 @@ Let's take an example how to insert data into the GridDB Cloud database:
 ```js
 const sql = "insert into resumes (id, rawContent, formattedContent, status, createdAt, information) values(3, 'raw contenct here', ' formatted content here', 'success', TIMESTAMP('2025-01-02'), '{tokens: 300}')";
 
-const response = await fetch(`${process.env.GRIDDB_WEBAPI_URL}'/sql/update'`, {
+const response = await fetch(`${process.env.GRIDDB_WEBAPI_URL}'/sql/dml/update'`, {
    method: 'POST',
    headers: {
     'Content-Type': 'application/json',
@@ -378,7 +378,7 @@ const response = await fetch(`${process.env.GRIDDB_WEBAPI_URL}'/sql/update'`, {
   const responseText = await response.text();
 ```
 
-The code above inserts the resume data into the GridDB Cloud database using the `/sql/update` endpoint and the SQL query.
+The code above inserts the resume data into the GridDB Cloud database using the `/sql/dml/update` endpoint and the SQL query.
 
 
 All these data operations will be handled by the Node.js server and exposed as API endpoints for the user interface to interact with.
