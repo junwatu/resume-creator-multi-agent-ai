@@ -317,6 +317,38 @@ GridDB Cloud provides a [RESTful API](https://www.toshiba-sol.co.jp/pro/griddbcl
 
 The `griddb-client.js` file contains the code to interact with the GridDB Cloud database. It includes functions to insert, retrieve, and delete resume data.
 
+To insert new data, you can use the endpoint `/containers/${containerName}/rows`. This endpoint allows you to add a new row of data to the database:
+
+```js
+async function insertData({
+		data,
+		containerName = 'resumes'
+	}) {
+
+		console.log(data);
+		try {
+			const timestamp = data.createdAt instanceof Date
+				? data.createdAt.toISOString()
+				: data.createdAt;
+
+			const row = [
+				parseInt(data.id),           // INTEGER
+				data.rawContent,             // STRING
+				data.formattedContent,       // STRING
+				data.status,                 // STRING
+				timestamp,                   // TIMESTAMP (ISO format)
+				data.information             // STRING
+			];
+
+			const path = `/containers/${containerName}/rows`;
+
+			return await makeRequest(path, [row], 'PUT');
+		} catch (error) {
+			throw new Error(`Failed to insert data: ${error.message}`);
+		}
+	}
+```
+
 GridDB also supports SQL-like queries to interact with the database. Here's an example of an SQL query to retrieve all resumes from the database:
 
 ```sql
@@ -347,6 +379,7 @@ const response = await fetch(`${process.env.GRIDDB_WEBAPI_URL}'/sql/update'`, {
 ```
 
 The code above inserts the resume data into the GridDB Cloud database using the `/sql/update` endpoint and the SQL query.
+
 
 All these data operations will be handled by the Node.js server and exposed as API endpoints for the user interface to interact with.
 
