@@ -11,12 +11,15 @@ export function createGridDBClient(config) {
 
 	const baseUrl = griddbWebApiUrl;
 	const authToken = Buffer.from(`${username}:${password}`).toString('base64');
+	//const authToken = `${username}:${password}`;
 
-	async function makeRequest(path, payload) {
+	async function makeRequest(path, payload, method) {
+		console.log(`path: ${baseUrl}${path}`);
+		console.log(`authToken: ${authToken}`);
 		const response = await fetch(`${baseUrl}${path}`, {
-			method: 'POST',
+			method: method || 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json; charset=UTF-8',
 				'Authorization': `Basic ${authToken}`,
 			},
 			body: JSON.stringify(payload),
@@ -27,6 +30,8 @@ export function createGridDBClient(config) {
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status} - ${responseText || response.statusText}`);
 		}
+
+		console.log(`Response: ${responseText}`);
 
 		return processResponse(responseText);
 	}
@@ -50,7 +55,7 @@ export function createGridDBClient(config) {
 			{ name: 'formattedContent', type: 'STRING' },
 			{ name: 'status', type: 'STRING' },
 			{ name: 'createdAt', type: 'TIMESTAMP' },
-			{ name: 'information', type: 'STRING' },
+			{ name: 'information', type: 'STRING' }
 		],
 	} = {}) {
 		const payload = {
@@ -62,7 +67,7 @@ export function createGridDBClient(config) {
 
 		const existingContainerUrl = `/containers/${containerName}/info`;
 
-		try { 
+		try {
 			fetch(`${baseUrl}${existingContainerUrl}`, {
 				method: 'GET',
 				headers: {
@@ -74,15 +79,16 @@ export function createGridDBClient(config) {
 				} else {
 					console.log(`Container ${containerName} already exists`);
 				}
-			}); 
+			});
 		} catch (error) {
 			throw new Error(`Failed to create GridDB container: ${error.message}`);
 		}
 	}
 
+
 	async function insertData({
 		data,
-		containerName = 'resumes',
+		containerName = 'resumes'
 	}) {
 
 		console.log(data);
@@ -91,22 +97,23 @@ export function createGridDBClient(config) {
 				? data.createdAt.toISOString()
 				: data.createdAt;
 
-			const escapedValues = [
-				parseInt(data.id),
-				data.rawContent,
-				data.formattedContent,
-				data.status,
-				timestamp,
-				data.information,
-			].map(value => value.toString().replace(/'/g, "''"));
+			const row = [
+				parseInt(data.id),           // INTEGER
+				data.rawContent,             // STRING
+				data.formattedContent,       // STRING
+				data.status,                 // STRING
+				timestamp,                   // TIMESTAMP (ISO format)
+				data.information             // STRING
+			];
 
-			const sql = `insert into ${containerName}(id, rawContent, formattedContent, status, createdAt, information) values(${escapedValues[0]}, '${escapedValues[1]}', '${escapedValues[2]}', '${escapedValues[3]}', TIMESTAMP('${escapedValues[4]}'), '${escapedValues[5]}')`;
+			const path = `/containers/${containerName}/rows`;
 
-			return await makeRequest('/sql/update', [{ stmt: sql }]);
+			return await makeRequest(path, [row], 'PUT');
 		} catch (error) {
 			throw new Error(`Failed to insert data: ${error.message}`);
 		}
 	}
+
 
 	/**
   * Searches data in GridDB using SQL queries
@@ -116,12 +123,13 @@ export function createGridDBClient(config) {
   * @returns {Promise<Object>} Response from the GridDB Web API
   */
 	async function searchData(queries) {
+		console.log(queries);
 		try {
 			if (!Array.isArray(queries) || queries.length === 0) {
 				throw new Error('Queries must be a non-empty array of SQL query objects.');
 			}
 
-			return await makeRequest('/sql', queries);
+			return await makeRequest('/sql/dml/query', queries);
 		} catch (error) {
 			throw new Error(`Failed to search data: ${error.message}`);
 		}
